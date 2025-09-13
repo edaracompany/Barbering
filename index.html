@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نظام إدارة البيوتي سنتر - تجريبي (غير محفوظ على المتصفح)</title>
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">E</div>
+        <div>
+          <h1>نظام إدارة البيوتي سنتر</h1>
+          <div class="muted">نسخة تجريبية - البيانات غير محفوظة عند إعادة تحميل الصفحة</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="pill" id="currentRole">الدور: مشرف</div>
+        <button id="toggleRole" class="btn">تبديل الصلاحية</button>
+        <button id="resetBtn" class="btn danger">إعادة ضبط كل البيانات (صفحة فقط)</button>
+      </div>
+    </header>
+
+    <nav id="modulesNav">
+      <!-- سيتم تعبئته ديناميكياً -->
+    </nav>
+
+    <div class="container">
+      <aside class="sidebar">
+        <div class="card">
+          <h3>سجل سريع</h3>
+          <div class="muted">أدخل عناصر جديدة في أي قسم وسيظهر الاسم تلقائياً في القوائم المرتبطة.</div>
+        </div>
+
+        <div class="card">
+          <h4>بحث وفلترة</h4>
+          <input id="globalSearch" placeholder="ابحث باسم عميل، موظف، خدمة..." />
+          <div style="height:8px"></div>
+          <div class="flex">
+            <button id="openReports" class="btn">فتح التقارير</button>
+            <button id="openMarketing" class="btn">التسويق</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>معلومات موجزة</h4>
+          <div class="muted">العملاء: <span id="countClients">0</span></div>
+          <div class="muted">الموظفين: <span id="countEmployees">0</span></div>
+          <div class="muted">الخدمات: <span id="countServices">0</span></div>
+          <div class="muted">المخزون: <span id="countInventory">0</span></div>
+        </div>
+
+      </aside>
+
+      <main class="main">
+        <!-- Sections rendered here -->
+        <div id="sectionArea"></div>
+      </main>
+    </div>
+
+    <footer style="margin-top:12px;text-align:center;color:var(--muted);font-size:13px">تم التصميم خصيصاً لك — جميع البيانات تختفي بعد إعادة تحميل الصفحة.</footer>
+  </div>
+
+  <script src="js/index.js"></script>
+</body>
+</html>
