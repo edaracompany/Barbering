@@ -1,68 +1,224 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>نظام إدارة البيوتي سنتر - تجريبي (غير محفوظ على المتصفح)</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>نظام إدارة صالون / بيونتي سنتر (نسخة جافاسكربت - بيانات غير محفوظة)</title>
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
   <div class="app">
-    <header>
+    <aside class="sidebar" aria-label="الشريط الجانبي">
       <div class="brand">
         <div class="logo">E</div>
         <div>
-          <h1>نظام إدارة البيوتي سنتر</h1>
-          <div class="muted">نسخة تجريبية - البيانات غير محفوظة عند إعادة تحميل الصفحة</div>
+          <h1>Edara - إدارة الصالون</h1>
+          <div class="muted small">جلسة مؤقتة — البيانات لن تحفظ عند الخروج</div>
         </div>
       </div>
-      <div class="top-actions">
-        <div class="pill" id="currentRole">الدور: مشرف</div>
-        <button id="toggleRole" class="btn">تبديل الصلاحية</button>
-        <button id="resetBtn" class="btn danger">إعادة ضبط كل البيانات (صفحة فقط)</button>
+
+      <nav class="nav" id="mainNav">
+        <!-- الأزرار تُبنى من JS -->
+      </nav>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0">
+      <div class="muted small">نظام خفيف | تفاعل DOM كامل | لا تسجيل دخول</div>
+    </aside>
+
+    <main class="main">
+      <div class="header card">
+        <h2 id="sectionTitle">لوحة القيادة</h2>
+        <div class="toolbar">
+          <div class="chip" id="summaryCount">العملاء: 0 • موظفين: 0 • خدمات: 0</div>
+          <button class="btn ghost" id="resetSession">إعادة تعيين الجلسة</button>
+        </div>
       </div>
-    </header>
 
-    <nav id="modulesNav">
-      <!-- سيتم تعبئته ديناميكياً -->
-    </nav>
-
-    <div class="container">
-      <aside class="sidebar">
+      <div class="cards">
         <div class="card">
-          <h3>سجل سريع</h3>
-          <div class="muted">أدخل عناصر جديدة في أي قسم وسيظهر الاسم تلقائياً في القوائم المرتبطة.</div>
+          <h3>نظرة سريعة</h3>
+          <p class="muted small">استعرض الأقسام وأضف سجلات. تذكر: المعلومات مؤقتة وتختفي عند إعادة تحميل الصفحة.</p>
+          <div style="margin-top:8px">
+            <div class="flex" style="justify-content:space-between"><div>حجوزات اليوم</div><div id="todayAppointmentsCount">0</div></div>
+            <div class="flex" style="justify-content:space-between;margin-top:6px"><div>فواتير مفتوحة</div><div id="openInvoicesCount">0</div></div>
+          </div>
         </div>
 
-        <div class="card">
-          <h4>بحث وفلترة</h4>
-          <input id="globalSearch" placeholder="ابحث باسم عميل، موظف، خدمة..." />
-          <div style="height:8px"></div>
-          <div class="flex">
-            <button id="openReports" class="btn">فتح التقارير</button>
-            <button id="openMarketing" class="btn">التسويق</button>
+       
+
+        <div class="card" id="quickActions">
+          <h3>أجراءات سريعة</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn" data-action="open:addClient">أضف زبون جديد</button>
+            <button class="btn" data-action="open:addEmployee">أضف موظف</button>
+            <button class="btn" data-action="open:addService">أضف خدمة</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sections -->
+      <section id="dashboard" class="section active card">
+        <h3>اللوحة</h3>
+        <p class="muted">مرحباً! اختر قسم من الشريط الجانبي لبدء العمل.</p>
+      </section>
+
+      <section id="appointments" class="section card">
+        <h3>المواعيد</h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <div style="flex:1">
+            <label>الزبون</label>
+            <select id="apptClient"></select>
+          </div>
+          <div style="width:160px">
+            <label>الموظف</label>
+            <select id="apptEmployee"></select>
+          </div>
+          <div style="width:180px">
+            <label>الخدمة</label>
+            <select id="apptService"></select>
+          </div>
+          <div style="width:200px">
+            <label>التاريخ والوقت</label>
+            <input id="apptDatetime" type="datetime-local" />
+          </div>
+          <div style="display:flex;align-items:end">
+            <button class="btn" id="addAppt">أضف موعد</button>
           </div>
         </div>
 
         <div class="card">
-          <h4>معلومات موجزة</h4>
-          <div class="muted">العملاء: <span id="countClients">0</span></div>
-          <div class="muted">الموظفين: <span id="countEmployees">0</span></div>
-          <div class="muted">الخدمات: <span id="countServices">0</span></div>
-          <div class="muted">المخزون: <span id="countInventory">0</span></div>
+          <h4>قائمة المواعيد</h4>
+          <table id="apptTable"><thead><tr><th>الزبون</th><th>الموظف</th><th>الخدمة</th><th>زمن</th><th>حالة</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="employees" class="section card">
+        <h3>الموظفين</h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <div style="flex:1"><label>الاسم الكامل</label><input id="empName" placeholder="اسم الموظف"/></div>
+          <div style="width:140px"><label>المسمى</label><input id="empRole" placeholder="مثال: مصفف"/></div>
+          <div style="width:120px"><label>الراتب الشهري</label><input id="empSalary" type="number" min="0" placeholder="0"/></div>
+          <div style="display:flex;align-items:end"><button class="btn" id="addEmployeeBtn">أضف موظف</button></div>
         </div>
 
-      </aside>
+        <div class="card">
+          <h4>قائمة الموظفين</h4>
+          <table id="empTable"><thead><tr><th>الاسم</th><th>المسمى</th><th>الراتب</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
 
-      <main class="main">
-        <!-- Sections rendered here -->
-        <div id="sectionArea"></div>
-      </main>
-    </div>
+      <section id="services" class="section card">
+        <h3>الخدمات</h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <div style="flex:1"><label>اسم الخدمة</label><input id="serviceName" placeholder="قص شعر"/></div>
+          <div style="width:140px"><label>مدة (دقائق)</label><input id="serviceDuration" type="number" min="1" value="30"/></div>
+          <div style="width:120px"><label>السعر</label><input id="servicePrice" type="number" min="0" value="0"/></div>
+          <div style="display:flex;align-items:end"><button class="btn" id="addServiceBtn">أضف خدمة</button></div>
+        </div>
 
-    <footer style="margin-top:12px;text-align:center;color:var(--muted);font-size:13px">تم التصميم خصيصاً لك — جميع البيانات تختفي بعد إعادة تحميل الصفحة.</footer>
+        <div class="card">
+          <h4>قائمة الخدمات</h4>
+          <table id="serviceTable"><thead><tr><th>الخدمة</th><th>المدة</th><th>السعر</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="payroll" class="section card">
+        <h3>الرواتب والمحاسبة</h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <div style="flex:1">
+            <label>اختر موظف</label>
+            <select id="payEmployee"></select>
+          </div>
+          <div style="width:160px"><label>شهر</label><input id="payMonth" type="month"/></div>
+          <div style="width:140px"><label>خصم</label><input id="payDeduction" type="number" value="0"/></div>
+          <div style="width:120px"><label>علاوات</label><input id="payBonus" type="number" value="0"/></div>
+          <div style="display:flex;align-items:end"><button class="btn" id="issuePay">اصدر راتب</button></div>
+        </div>
+
+        <div class="card">
+          <h4>سجلات الرواتب</h4>
+          <table id="payTable"><thead><tr><th>الموظف</th><th>شهر</th><th>صافي</th><th>تفاصيل</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="cashier" class="section card">
+        <h3>الكاشير والفواتير</h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <div style="flex:1"><label>الزبون (اختياري)</label><select id="invoiceClient"><option value="">-- زبون --</option></select></div>
+          <div style="width:200px"><label>الخدمة</label><select id="invoiceService"></select></div>
+          <div style="width:120px"><label>الكمية</label><input id="invoiceQty" type="number" value="1" min="1"/></div>
+          <div style="width:140px;display:flex;align-items:end"><button class="btn" id="addToInvoice">أضف للفاتورة</button></div>
+        </div>
+
+        <div class="card">
+          <h4>الفاتورة الحالية</h4>
+          <table id="invoiceTable"><thead><tr><th>الخدمة</th><th>كمية</th><th>سعر</th><th>المجموع</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;align-items:center"><div class="muted">الإجمالي:</div><div id="invoiceTotal">0</div><button class="btn" id="createInvoice">احفظ فاتورة مؤقتة</button></div>
+        </div>
+
+        <div class="card">
+          <h4>سجل الفواتير (مفتوح خلال الجلسة)</h4>
+          <table id="invoicesLog"><thead><tr><th>رقم</th><th>الزبون</th><th>مجموع</th><th>تاريخ</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="inventory" class="section card">
+        <h3>المخزون</h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <div style="flex:1"><label>اسم الصنف</label><input id="stockName" placeholder="ماء أكسجين"/></div>
+          <div style="width:140px"><label>الكمية</label><input id="stockQty" type="number" value="1" min="0"/></div>
+          <div style="width:120px"><label>وحدة</label><input id="stockUnit" placeholder="قطعة، لتر"/></div>
+          <div style="display:flex;align-items:end"><button class="btn" id="addStockBtn">أضف للمخزون</button></div>
+        </div>
+
+        <div class="card">
+          <h4>قائمة المخزون</h4>
+          <table id="stockTable"><thead><tr><th>الصنف</th><th>كمية</th><th>الوحدة</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="reports" class="section card">
+        <h3>التقارير</h3>
+        <div class="card">
+          <h4>تقرير إجمالي - جلسة واحدة</h4>
+          <div id="reportSummary"></div>
+          <div style="margin-top:8px"><button class="btn" id="generateReport">تحديث التقرير</button></div>
+        </div>
+      </section>
+
+      <section id="marketing" class="section card">
+        <h3>التسويق</h3>
+        <div class="card">
+          <h4>قائمة العملاء وارسال رسالة (محاكاة)</h4>
+          <p class="muted small">يمكنك اختيار مجموعة عملاء وإرسال رسالة تجريبية تظهر هنا (لا ترسل فعلياً).</p>
+          <div class="form-row" style="margin-top:8px">
+            <div style="flex:1"><label>النص</label><textarea id="marketingText" rows="2" placeholder="عرض خاص هذا الاسبوع"></textarea></div>
+            <div style="width:160px;display:flex;align-items:end"><button class="btn" id="sendMarketing">عرض المعاينة</button></div>
+          </div>
+          <div id="marketingPreview" style="margin-top:8px"></div>
+        </div>
+      </section>
+
+      <section id="security" class="section card">
+        <h3>الصلاحيات والأمان</h3>
+        <div class="card">
+          <h4>إعداد أدوار (محاكاة)</h4>
+          <p class="muted small">نظام بسيط لإدارة الأدوار داخل الجلسة. لا يوجد تسجيل دخول. هذا القسم للتحكم الظاهري فقط.</p>
+          <div class="form-row" style="margin-top:8px">
+            <div style="flex:1"><label>اسم الدور</label><input id="roleName"/></div>
+            <div style="width:140px;display:flex;align-items:end"><button class="btn" id="addRoleBtn">أضف دور</button></div>
+          </div>
+          <div class="card" style="margin-top:8px">
+            <h4>قائمة الأدوار</h4>
+            <table id="rolesTable"><thead><tr><th>الدور</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <footer>صُنع لأغراض إدارة جلسة داخل المتصفح — البيانات مؤقتة وتُفقد عند إعادة تحميل الصفحة</footer>
+    </main>
   </div>
 
-  <script src="js/index.js"></script>
+    <script src="js/index.js"></script>
 </body>
 </html>
